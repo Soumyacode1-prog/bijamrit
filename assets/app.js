@@ -353,11 +353,9 @@
   }
 
   /* ===================== HOME ===================== */
-  var VIDEOS = [
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
-  ];
+  /* Real makhana videos (YouTube), matched to the card titles in DOM order:
+     1) harvesting  2) flavour/roasting kitchen  3) makhana superfood story */
+  var VIDEOS = ['8DTlI5-VPRI', 'mSIMEVy3TSo', 'EhLDeKS96DI'];
   function initHome() {
     if (page !== 'Home') return;
     var byName = {}; S.PRODUCTS.forEach(function (p) { byName[p.name] = p; });
@@ -388,17 +386,23 @@
       card.addEventListener('click', function () { openVideo(src, title); });
     });
   }
-  function openVideo(src, title) {
+  function openVideo(ytid, title) {
+    var watch = 'https://www.youtube.com/watch?v=' + ytid;
     var m = document.createElement('div');
-    m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);display:grid;place-items:center;z-index:9999;padding:20px;animation:bijUp .25s both';
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.82);display:grid;place-items:center;z-index:9999;padding:20px;animation:bijUp .25s both';
     m.innerHTML = '<div style="width:min(900px,100%);background:#000;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#21303a;color:#fff;font:700 14px Plus Jakarta Sans,sans-serif">' + title
-      + '<span id="vx" style="cursor:pointer;font-size:20px">✕</span></div>'
-      + '<video src="' + src + '" controls autoplay playsinline style="width:100%;display:block;background:#000;max-height:70vh"></video></div>';
+      + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:#21303a;color:#fff;font:700 14px Plus Jakarta Sans,sans-serif">'
+      + '<span>' + title + '</span>'
+      + '<span style="display:flex;align-items:center;gap:14px"><a href="' + watch + '" target="_blank" rel="noopener" style="color:#a9cdd6;font-size:12px;font-weight:700;text-decoration:none">Watch on YouTube ↗</a>'
+      + '<span id="vx" style="cursor:pointer;font-size:20px">✕</span></span></div>'
+      + '<div style="position:relative;width:100%;padding-top:56.25%;background:#000">'
+      + '<iframe src="https://www.youtube-nocookie.com/embed/' + ytid + '?autoplay=1&rel=0&modestbranding=1" '
+      + 'style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div></div>';
     document.body.appendChild(m);
     var close = function () { m.remove(); };
     m.addEventListener('click', function (e) { if (e.target === m) close(); });
     $('#vx', m).onclick = close;
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
   }
 
   /* ===================== CONTACT ===================== */
