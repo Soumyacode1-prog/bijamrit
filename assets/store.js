@@ -4,6 +4,7 @@
   var IMG = 'assets/img/';
   var PRODUCTS = [
     { id: 'classic', name: 'Classic Makhana',     price: 199,  old: 249,  rating: 4.8, reviews: 214, weight: '100g',     img: IMG + 'img-2.webp', badge: '20% OFF', cat: 'Roasted'  },
+    { id: 'raw',     name: 'Raw Makhana',         price: 179,  old: 219,  rating: 4.6, reviews: 121, weight: '250g',     img: IMG + 'img-5.webp', badge: 'Raw',     cat: 'Raw'      },
     { id: 'peri',    name: 'Peri Peri Makhana',   price: 219,  old: 279,  rating: 4.7, reviews: 186, weight: '100g',     img: IMG + 'img-0.webp', badge: '22% OFF', cat: 'Flavoured'},
     { id: 'pudina',  name: 'Pudina Makhana',      price: 209,  old: 269,  rating: 4.6, reviews: 142, weight: '100g',     img: IMG + 'img-3.webp', badge: '22% OFF', cat: 'Flavoured'},
     { id: 'cheese',  name: 'Cheese Makhana',      price: 229,  old: 299,  rating: 4.7, reviews: 168, weight: '100g',     img: IMG + 'img-1.webp', badge: 'New',     cat: 'Flavoured'},
