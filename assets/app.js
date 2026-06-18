@@ -577,6 +577,81 @@
     select(qs('p') || 'privacy');
   }
 
+  /* ===================== help chat widget ===================== */
+  var FAQ = [
+    { q: 'What is makhana?', a: 'Makhana (fox nuts) are seeds of the Euryale water-lily — slow-roasted, never fried, into a light, protein-rich snack. Ours are hand-picked from the ponds of Bihar. 🌿' },
+    { q: 'Delivery time & charges?', a: 'We dispatch in 1–2 business days and deliver across India in <b>3–7 days</b>. Shipping is <b>free over ₹599</b> (a flat ₹49 otherwise).' },
+    { q: 'Any offers or coupons?', a: 'Yes! Use <b>WELCOME10</b> (10% off), <b>SAVE150</b> (₹150 off over ₹999) or <b>FREESHIP</b>. See the <a href="offers.html" style="color:#355a6e;font-weight:700">Offers page</a>.' },
+    { q: 'Return & refund policy?', a: 'You can request a refund or replacement within <b>7 days</b> if your order arrives damaged or incorrect. Details on our <a href="policies.html?p=refund" style="color:#355a6e;font-weight:700">Refund Policy</a>.' },
+    { q: 'How do I track my order?', a: 'Once your order ships, you\'ll get a tracking link by email & SMS to follow it to your doorstep. 📦' },
+    { q: 'Which makhana should I try?', a: 'New here? Start with <b>Classic Makhana</b> (₹199) for a clean crunch, or <b>Peri Peri</b> if you like a kick. Browse all on the <a href="shop.html" style="color:#355a6e;font-weight:700">Shop page</a>.' },
+    { q: 'How can I reach you?', a: 'Call <b>+91 98765 43210</b>, email <b>care@bijamrit.com</b>, or use the <a href="contact.html" style="color:#355a6e;font-weight:700">Contact page</a>. We\'re on WhatsApp 24/7!' }
+  ];
+  function initChat() {
+    if (document.getElementById('bij-chat')) return;
+    // hide the static home WhatsApp bubble — we add one global widget on every page
+    document.querySelectorAll('div').forEach(function (d) {
+      if (!d.children.length && d.textContent.trim() === '💬') {
+        var st = d.getAttribute('style') || '';
+        if (/position:\s*absolute/.test(st) && st.indexOf('25d366') !== -1) d.style.display = 'none';
+      }
+    });
+
+    var root = document.createElement('div');
+    root.id = 'bij-chat';
+    root.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9998;display:flex;flex-direction:column;align-items:flex-end;font-family:Plus Jakarta Sans,sans-serif';
+    root.innerHTML =
+      '<div id="bij-chat-panel" style="display:none;width:330px;max-width:86vw;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.25);margin-bottom:14px">'
+      + '<div style="background:#21303a;color:#fff;padding:15px 18px;display:flex;justify-content:space-between;align-items:center">'
+      + '<div><div style="font-weight:800;font-size:15px">Bijamrit Help 🪶</div><div style="font-size:11px;color:#a9cdd6;margin-top:2px">Typically replies instantly</div></div>'
+      + '<span id="bij-chat-x" style="cursor:pointer;font-size:18px">✕</span></div>'
+      + '<div id="bij-chat-msgs" style="padding:16px;height:286px;overflow-y:auto;background:#f3f6f6;display:flex;flex-direction:column;gap:10px"></div>'
+      + '<div style="padding:11px 12px 6px;font-size:11px;color:#8a8678;font-weight:600;background:#fff">Pick a question:</div>'
+      + '<div id="bij-chat-q" style="padding:0 12px 12px;display:flex;flex-wrap:wrap;gap:8px;background:#fff;max-height:120px;overflow-y:auto"></div></div>'
+      + '<div id="bij-chat-btn" title="Need help?" style="width:58px;height:58px;border-radius:50%;background:#25d366;color:#fff;display:grid;place-items:center;font-size:27px;box-shadow:0 8px 22px rgba(37,211,102,.45);cursor:pointer">💬</div>';
+    document.body.appendChild(root);
+
+    var panel = root.querySelector('#bij-chat-panel');
+    var msgs = root.querySelector('#bij-chat-msgs');
+    var qbar = root.querySelector('#bij-chat-q');
+    var btn = root.querySelector('#bij-chat-btn');
+    var opened = false, greeted = false;
+
+    function bubble(html, mine) {
+      var b = document.createElement('div');
+      b.style.cssText = 'max-width:84%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.5;animation:bijUp .22s both;'
+        + (mine ? 'align-self:flex-end;background:#355a6e;color:#fff;border-bottom-right-radius:4px'
+                : 'align-self:flex-start;background:#fff;color:#2c2c28;border:1px solid #e4ebec;border-bottom-left-radius:4px');
+      b.innerHTML = html; msgs.appendChild(b); msgs.scrollTop = msgs.scrollHeight; return b;
+    }
+    function ask(item) {
+      bubble(item.q, true);
+      var typing = bubble('<span style="opacity:.6">typing…</span>', false);
+      setTimeout(function () { typing.innerHTML = item.a; msgs.scrollTop = msgs.scrollHeight; }, 550);
+    }
+    function toggle(state) {
+      opened = (state === undefined) ? !opened : state;
+      panel.style.display = opened ? 'block' : 'none';
+      btn.textContent = opened ? '✕' : '💬';
+      btn.style.background = opened ? '#21303a' : '#25d366';
+      if (opened) {
+        panel.style.animation = 'bijUp .25s both';
+        if (!greeted) { greeted = true; bubble('Namaste! 🙏 I\'m the Bijamrit helper. Tap a question below and I\'ll answer right away.', false); }
+        msgs.scrollTop = msgs.scrollHeight;
+      }
+    }
+    FAQ.forEach(function (item) {
+      var chip = document.createElement('span');
+      chip.className = 'bij-btn';
+      chip.style.cssText = 'background:#eef4f4;color:#355a6e;font-size:12px;font-weight:600;padding:8px 12px;border-radius:999px;cursor:pointer';
+      chip.textContent = item.q;
+      chip.onclick = function () { ask(item); };
+      qbar.appendChild(chip);
+    });
+    btn.onclick = function () { toggle(); };
+    root.querySelector('#bij-chat-x').onclick = function () { toggle(false); };
+  }
+
   /* ===================== announcement marquee ===================== */
   function initMarquee() {
     document.querySelectorAll('div').forEach(function (el) {
@@ -595,7 +670,7 @@
 
   function run() {
     initShop(); initCart(); initCheckout(); initWishlist(); initSearch();
-    initProduct(); initHome(); initContact(); initOffers(); initMarquee(); initPolicies();
+    initProduct(); initHome(); initContact(); initOffers(); initMarquee(); initPolicies(); initChat();
     wireCopy();
     if (S) S.updateBadge();
   }
