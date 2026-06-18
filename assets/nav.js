@@ -4,7 +4,7 @@
 (function () {
   // nav label (lowercased text) -> page
   var NAV = {
-    'shop': 'shop.html',
+    'shop': 'https://soumyacode1-prog.github.io/bijamrit/',
     'categories': 'shop.html',
     'offers': 'offers.html',
     'about': 'about.html',

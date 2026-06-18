@@ -190,7 +190,10 @@
         + '<div style="display:flex;gap:10px;margin-top:22px"><input id="promo" placeholder="Discount code" value="" '
         + 'style="flex:1;border:1px solid #e4e3da;border-radius:12px;font-size:13px;padding:14px 16px"/>'
         + '<div id="applypromo" class="bij-btn" style="background:#2c2c28;color:#fff;font-size:13px;font-weight:700;padding:14px 24px;border-radius:12px;cursor:pointer">Apply</div></div>'
-        + promoNote + '<div style="font-size:11px;color:#8a8678;margin-top:10px">Try <b>WELCOME10</b>, <b>SAVE150</b> or <b>FREESHIP</b></div></div>'
+        + promoNote + '<div style="font-size:11px;color:#8a8678;margin-top:10px">Try '
+        + '<b data-copy="WELCOME10" style="color:#355a6e">WELCOME10</b>, '
+        + '<b data-copy="SAVE150" style="color:#355a6e">SAVE150</b> or '
+        + '<b data-copy="FREESHIP" style="color:#355a6e">FREESHIP</b></div></div>'
         // summary
         + '<div style="background:#eef4f4;border-radius:18px;padding:26px;height:fit-content">'
         + '<div style="font-size:16px;font-weight:800;margin-bottom:18px">Order summary</div>'
@@ -206,7 +209,7 @@
       host.querySelectorAll('.rem').forEach(function (b) { b.onclick = function () { S.removeFromCart(b.dataset.id); render(); }; });
       var ap = $('#applypromo'); if (ap) ap.onclick = function () { var r = S.setPromo($('#promo').value); S.toast(r.msg); if (r.ok) render(); };
       var rp = $('#rmpromo'); if (rp) rp.onclick = function () { S.clearPromo(); render(); };
-      wireGo();
+      wireGo(); wireCopy();
     }
     function sumRow(l, v) { return '<div style="display:flex;justify-content:space-between;font-size:13px;color:#4c4c45;margin-bottom:12px"><span>' + l + '</span><span style="font-weight:700">' + v + '</span></div>'; }
     render();
@@ -419,6 +422,48 @@
     };
   }
 
+  /* ---------- copy-to-clipboard ---------- */
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+    return new Promise(function (res, rej) {
+      try { var ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); ta.remove(); res(); }
+      catch (e) { rej(e); }
+    });
+  }
+  /* wire any element with data-copy="CODE" to copy on click + show feedback */
+  function wireCopy() {
+    document.querySelectorAll('[data-copy]').forEach(function (el) {
+      if (el.dataset.copywired) return; el.dataset.copywired = '1';
+      el.style.cursor = 'pointer'; el.title = 'Click to copy';
+      el.classList.add('bij-btn');
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var code = el.getAttribute('data-copy');
+        copyText(code).then(function () {
+          S.toast('Copied “' + code + '” — paste it at checkout!');
+          var prev = el.innerHTML; el.innerHTML = 'Copied ✓';
+          el.classList.remove('bij-pop'); void el.offsetWidth; el.classList.add('bij-pop');
+          setTimeout(function () { el.innerHTML = prev; }, 1400);
+        }).catch(function () { S.toast('Copy failed — your code is ' + code); });
+      });
+    });
+  }
+
+  /* ===================== OFFERS ===================== */
+  function initOffers() {
+    if (page !== 'Offers') return;
+    var codes = Object.keys(S.PROMOS);
+    document.querySelectorAll('div').forEach(function (el) {
+      if (el.children.length) return;
+      var t = el.textContent.trim();
+      if (codes.indexOf(t) === -1) return;
+      el.setAttribute('data-copy', t);
+      el.innerHTML = t + ' <span style="opacity:.6;font-size:11px">📋</span>';
+    });
+    wireCopy();
+  }
+
   /* generic data-go navigation (for JS-rendered buttons) */
   function wireGo() {
     document.querySelectorAll('[data-go]').forEach(function (el) {
@@ -429,7 +474,8 @@
 
   function run() {
     initShop(); initCart(); initCheckout(); initWishlist(); initSearch();
-    initProduct(); initHome(); initContact();
+    initProduct(); initHome(); initContact(); initOffers();
+    wireCopy();
     if (S) S.updateBadge();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
