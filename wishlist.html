@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wishlist — Bijamrit</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f1;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#1b1b16;
+       display:flex;justify-content:center;padding:24px 16px;-webkit-font-smoothing:antialiased}
+  section.screen{width:1180px;max-width:100%;background:#fff;border-radius:6px;
+       box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden}
+  h1,h2,h3,.serif{font-family:'Instrument Serif',Georgia,serif}
+  [data-link]{cursor:pointer}
+  [data-link]:hover{opacity:.85}
+</style>
+</head>
+<body>
+<section class="screen" data-screen-label="Wishlist">
+      <div style="background:#355a6e;color:#e6eff0;font-size:12px;text-align:center;padding:9px;letter-spacing:.05em">Free shipping on orders over ₹599 · Pan-India delivery in 3–7 days</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid #e4ebec"><div style="display:flex;align-items:center;gap:7px;font-weight:800;font-size:21px;letter-spacing:-.02em">Bijamrit <span style="font-size:17px">🪶</span></div><div style="display:flex;gap:26px;font-size:13px;color:#5c5c54;font-weight:600"><span>Shop</span><span>Categories</span><span>Offers</span><span>About</span><span>Contact</span></div><div style="display:flex;gap:18px;font-size:16px;color:#5c5c54">🔍 <span style="color:#355a6e">♡</span> 👤 🛒</div></div>
+      <div style="padding:34px 40px"><h2 style="font-size:32px;font-weight:800;letter-spacing:-.02em">Your wishlist</h2><p id="wish-count" style="font-size:13px;color:#8a8678;margin-top:4px">4 saved items</p></div>
+      <div id="wishlist-app" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:0 40px 48px">
+        <div style="border:1px solid #e4ebec;border-radius:18px;overflow:hidden"><div style="position:relative"><img src="assets/img/img-2.webp" style="width:100%;height:170px;object-fit:cover"><span style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,.1);color:#c0392b">♥</span></div><div style="padding:14px"><div style="font-size:14px;font-weight:700">Classic Makhana</div><div style="font-size:14px;font-weight:800;margin-top:4px">₹199</div><div style="background:#355a6e;color:#fff;font-size:12px;font-weight:700;padding:10px;border-radius:10px;text-align:center;margin-top:12px">Add to cart</div></div></div>
+        <div style="border:1px solid #e4ebec;border-radius:18px;overflow:hidden"><div style="position:relative"><img src="assets/img/img-1.webp" style="width:100%;height:170px;object-fit:cover"><span style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,.1);color:#c0392b">♥</span></div><div style="padding:14px"><div style="font-size:14px;font-weight:700">Cheese Makhana</div><div style="font-size:14px;font-weight:800;margin-top:4px">₹229</div><div style="background:#355a6e;color:#fff;font-size:12px;font-weight:700;padding:10px;border-radius:10px;text-align:center;margin-top:12px">Add to cart</div></div></div>
+        <div style="border:1px solid #e4ebec;border-radius:18px;overflow:hidden"><div style="position:relative"><img src="assets/img/img-4.webp" style="width:100%;height:170px;object-fit:cover"><span style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,.1);color:#c0392b">♥</span></div><div style="padding:14px"><div style="font-size:14px;font-weight:700">Festive Gift Box</div><div style="font-size:14px;font-weight:800;margin-top:4px">₹1,299</div><div style="background:#355a6e;color:#fff;font-size:12px;font-weight:700;padding:10px;border-radius:10px;text-align:center;margin-top:12px">Add to cart</div></div></div>
+        <div style="border:1px solid #e4ebec;border-radius:18px;overflow:hidden"><div style="position:relative"><img src="assets/img/img-3.webp" style="width:100%;height:170px;object-fit:cover"><span style="position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,.1);color:#c0392b">♥</span></div><div style="padding:14px"><div style="font-size:14px;font-weight:700">Pudina Makhana</div><div style="font-size:14px;font-weight:800;margin-top:4px">₹209</div><div style="background:#355a6e;color:#fff;font-size:12px;font-weight:700;padding:10px;border-radius:10px;text-align:center;margin-top:12px">Add to cart</div></div></div>
+      </div>
+      <div style="background:#21303a;color:#76858b;text-align:center;font-size:11px;padding:18px">© 2026 Bijamrit 🪶 · Crafted with devotion in Bihar.</div>
+    </section>
+<script src="assets/store.js"></script>
+<script src="assets/nav.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
