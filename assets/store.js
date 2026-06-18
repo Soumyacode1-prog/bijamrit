@@ -143,7 +143,11 @@
     + '.bij-btn{transition:transform .12s ease,opacity .15s ease}'
     + '.bij-btn:active{transform:scale(.96)}'
     + 'input,textarea,select{font-family:"Plus Jakarta Sans",sans-serif}'
-    + 'input:focus,textarea:focus,select:focus{outline:none;border-color:#355a6e !important;box-shadow:0 0 0 3px rgba(53,90,110,.12)}';
+    + 'input:focus,textarea:focus,select:focus{outline:none;border-color:#355a6e !important;box-shadow:0 0 0 3px rgba(53,90,110,.12)}'
+    + '.bij-marquee{overflow:hidden;white-space:nowrap}'
+    + '.bij-marquee-track{display:inline-block;white-space:nowrap;animation:bijMarquee 26s linear infinite;will-change:transform}'
+    + '.bij-marquee:hover .bij-marquee-track{animation-play-state:paused}'
+    + '@keyframes bijMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}';
   document.head.appendChild(css);
 
   window.Store = Store;

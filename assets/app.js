@@ -472,9 +472,25 @@
     });
   }
 
+  /* ===================== announcement marquee ===================== */
+  function initMarquee() {
+    document.querySelectorAll('div').forEach(function (el) {
+      if (el.children.length || el.dataset.marquee) return;
+      var t = el.textContent.trim();
+      if (t.indexOf('Free shipping') !== 0) return;
+      el.dataset.marquee = '1';
+      el.classList.add('bij-marquee');
+      el.style.textAlign = 'left';
+      el.style.padding = '9px 0';
+      var unit = '<span style="padding:0 30px">' + t + '</span><span style="padding:0 30px;opacity:.7">🪶</span>';
+      var track = ''; for (var i = 0; i < 6; i++) track += unit;   // 6 identical units → −50% loops seamlessly
+      el.innerHTML = '<div class="bij-marquee-track">' + track + '</div>';
+    });
+  }
+
   function run() {
     initShop(); initCart(); initCheckout(); initWishlist(); initSearch();
-    initProduct(); initHome(); initContact(); initOffers();
+    initProduct(); initHome(); initContact(); initOffers(); initMarquee();
     wireCopy();
     if (S) S.updateBadge();
   }
