@@ -161,27 +161,27 @@
     var host = $('#cart-app'); if (!host) return;
     var head = $('#cart-count');
     function render() {
-      var c = S.cart(), ids = Object.keys(c).filter(function (id) { return S.get(id); });
+      var c = S.cart(), keys = Object.keys(c).filter(function (k) { return S.get(S.lineId(k)); });
       var t = S.totals();
       if (head) head.textContent = S.cartCount() + ' item' + (S.cartCount() === 1 ? '' : 's');
-      if (!ids.length) {
+      if (!keys.length) {
         host.innerHTML = '<div style="padding:20px 0 60px;text-align:center;color:#8a8678">'
           + '<div style="font-size:46px">🛒</div><div style="margin-top:12px;font-weight:600">Your cart is empty.</div>'
           + '<div data-go="shop.html" class="bij-btn" style="display:inline-block;margin-top:18px;background:#355a6e;color:#fff;font-weight:700;font-size:14px;padding:13px 26px;border-radius:999px;cursor:pointer">Shop now</div></div>';
         wireGo(); return;
       }
-      var rows = ids.map(function (id, i) {
-        var p = S.get(id), q = c[id];
-        return '<div style="display:flex;gap:16px;align-items:center;padding:18px 0;border-top:1px solid #e4ebec' + (i === ids.length - 1 ? ';border-bottom:1px solid #e4ebec' : '') + '">'
+      var rows = keys.map(function (key, i) {
+        var p = S.get(S.lineId(key)), q = c[key], unit = S.linePrice(key), w = S.lineWeight(key);
+        return '<div style="display:flex;gap:16px;align-items:center;padding:18px 0;border-top:1px solid #e4ebec' + (i === keys.length - 1 ? ';border-bottom:1px solid #e4ebec' : '') + '">'
           + '<img src="' + p.img + '" style="width:90px;height:90px;object-fit:cover;border-radius:14px">'
           + '<div style="flex:1"><div style="font-size:15px;font-weight:700">' + p.name + '</div>'
-          + '<div style="font-size:12px;color:#8a8678;margin-top:2px">' + p.weight + '</div>'
+          + '<div style="font-size:12px;color:#8a8678;margin-top:2px">' + w + ' · ' + fmt(unit) + ' each</div>'
           + '<div style="display:flex;align-items:center;border:1px solid #e4e3da;border-radius:10px;width:fit-content;margin-top:10px">'
-          + '<span class="qmin bij-btn" data-id="' + id + '" style="padding:7px 12px;font-size:14px;color:#6b6b62;cursor:pointer">−</span>'
+          + '<span class="qmin bij-btn" data-id="' + key + '" style="padding:7px 12px;font-size:14px;color:#6b6b62;cursor:pointer">−</span>'
           + '<span style="padding:7px 12px;font-size:13px;font-weight:700">' + q + '</span>'
-          + '<span class="qplus bij-btn" data-id="' + id + '" style="padding:7px 12px;font-size:14px;color:#6b6b62;cursor:pointer">+</span></div></div>'
-          + '<div style="text-align:right"><div style="font-size:16px;font-weight:800">' + fmt(p.price * q) + '</div>'
-          + '<div class="rem bij-btn" data-id="' + id + '" style="font-size:12px;color:#a8a496;margin-top:8px;cursor:pointer">Remove</div></div></div>';
+          + '<span class="qplus bij-btn" data-id="' + key + '" style="padding:7px 12px;font-size:14px;color:#6b6b62;cursor:pointer">+</span></div></div>'
+          + '<div style="text-align:right"><div style="font-size:16px;font-weight:800">' + fmt(unit * q) + '</div>'
+          + '<div class="rem bij-btn" data-id="' + key + '" style="font-size:12px;color:#a8a496;margin-top:8px;cursor:pointer">Remove</div></div></div>';
       }).join('');
 
       var promoNote = t.code ? '<div style="font-size:12px;color:#355a6e;font-weight:700;margin-top:8px">✓ ' + t.code + ' applied · <span id="rmpromo" style="cursor:pointer;text-decoration:underline">remove</span></div>' : '';
@@ -218,18 +218,18 @@
   /* ===================== CHECKOUT ===================== */
   function initCheckout() {
     var host = $('#checkout-app'); if (!host) return;
-    var c = S.cart(), ids = Object.keys(c).filter(function (id) { return S.get(id); }), t = S.totals();
+    var c = S.cart(), ids = Object.keys(c).filter(function (k) { return S.get(S.lineId(k)); }), t = S.totals();
     var inp = function (id, ph, type) { return '<input id="' + id + '" type="' + (type || 'text') + '" placeholder="' + ph + '" style="border:1px solid #e4e3da;border-radius:12px;padding:14px 16px;font-size:13px;width:100%"/>'; };
     var pay = function (sel, label, on) {
       return '<label style="border:' + (on ? '1.5px solid #355a6e' : '1px solid #e4e3da') + ';border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:10px;cursor:pointer">'
         + '<input type="radio" name="pay" value="' + sel + '"' + (on ? ' checked' : '') + ' style="accent-color:#355a6e">'
         + '<span style="font-size:14px;font-weight:' + (on ? '700' : '600') + ';color:' + (on ? '#1b1b16' : '#6b6b62') + '">' + label + '</span></label>';
     };
-    var summaryItems = ids.length ? ids.map(function (id) {
-      var p = S.get(id), q = c[id];
+    var summaryItems = ids.length ? ids.map(function (key) {
+      var p = S.get(S.lineId(key)), q = c[key], unit = S.linePrice(key), w = S.lineWeight(key);
       return '<div style="display:flex;gap:12px;align-items:center;margin-bottom:14px"><img src="' + p.img + '" style="width:54px;height:54px;object-fit:cover;border-radius:10px">'
-        + '<div style="flex:1;font-size:13px;font-weight:700">' + p.name + ' <span style="color:#8a8678;font-weight:500">×' + q + '</span></div>'
-        + '<div style="font-size:13px;font-weight:700">' + fmt(p.price * q) + '</div></div>';
+        + '<div style="flex:1;font-size:13px;font-weight:700">' + p.name + ' <span style="color:#8a8678;font-weight:500">' + w + ' ×' + q + '</span></div>'
+        + '<div style="font-size:13px;font-weight:700">' + fmt(unit * q) + '</div></div>';
     }).join('') : '<div style="font-size:13px;color:#8a8678;margin-bottom:14px">Your cart is empty.</div>';
 
     host.innerHTML =
@@ -339,15 +339,49 @@
     var tag = $('#pd-tag'); if (tag) tag.textContent = p.name;
     var title = $('#pd-title'); if (title) title.textContent = p.name;
     var rate = $('#pd-rate'); if (rate) rate.textContent = p.rating.toFixed(1) + ' · ' + p.reviews + ' reviews';
-    var price = $('#pd-price'); if (price) price.textContent = fmt(p.price);
-    var oldEl = $('#pd-old'); if (oldEl) oldEl.style.display = p.old ? '' : 'none', oldEl.textContent = p.old ? fmt(p.old) : '';
-    var save = $('#pd-save'); if (save) { var pct = p.old ? Math.round((1 - p.price / p.old) * 100) : 0; save.style.display = pct ? '' : 'none'; save.textContent = 'Save ' + pct + '%'; }
     document.querySelectorAll('.pd-img').forEach(function (im) { im.src = p.img; });
+
+    // --- weight / size selection ---
+    var SIZES = S.WEIGHTS.map(function (w) { return w.label; });   // ['100g','250g','500g']
+    var selected = SIZES.indexOf(p.weight) !== -1 ? p.weight : '100g';
+    var priceEl = $('#pd-price'), oldEl = $('#pd-old'), save = $('#pd-save'), sizes = $('#pd-sizes');
+    // a weight is a "variant" (cart suffix) only when it differs from the product's listed weight
+    function keyFor(w) { return S.key(p.id, w === p.weight ? null : w); }
+    function unitFor(w) { return S.linePrice(keyFor(w)); }
+
+    function paintPrice() {
+      var price = unitFor(selected);
+      if (priceEl) priceEl.textContent = fmt(price);
+      var ratio = p.price ? price / p.price : 1;
+      var oldScaled = p.old ? Math.round(p.old * ratio / 5) * 5 : 0;
+      if (oldEl) { oldEl.style.display = oldScaled ? '' : 'none'; oldEl.textContent = oldScaled ? fmt(oldScaled) : ''; }
+      if (save) { var pct = oldScaled ? Math.round((1 - price / oldScaled) * 100) : 0; save.style.display = pct ? '' : 'none'; save.textContent = 'Save ' + pct + '%'; }
+    }
+    if (sizes) {
+      sizes.innerHTML = SIZES.map(function (w) {
+        var on = w === selected;
+        return '<span class="pd-size bij-btn" data-w="' + w + '" style="cursor:pointer;border:1.5px solid ' + (on ? '#355a6e' : '#e4e3da')
+          + ';color:' + (on ? '#355a6e' : '#6b6b62') + ';font-size:13px;font-weight:' + (on ? '700' : '600') + ';padding:9px 18px;border-radius:10px">' + w + '</span>';
+      }).join('');
+      sizes.querySelectorAll('.pd-size').forEach(function (s) {
+        s.onclick = function () {
+          selected = s.dataset.w;
+          sizes.querySelectorAll('.pd-size').forEach(function (x) {
+            var on = x.dataset.w === selected;
+            x.style.border = '1.5px solid ' + (on ? '#355a6e' : '#e4e3da');
+            x.style.color = on ? '#355a6e' : '#6b6b62'; x.style.fontWeight = on ? '700' : '600';
+          });
+          paintPrice();
+        };
+      });
+    }
+    paintPrice();
+
     var qEl = $('#pd-qty');
     var minus = $('#pd-minus'), plus = $('#pd-plus');
     if (minus) minus.onclick = function () { qty = Math.max(1, qty - 1); if (qEl) qEl.textContent = qty; };
     if (plus) plus.onclick = function () { qty = qty + 1; if (qEl) qEl.textContent = qty; };
-    var add = $('#pd-add'); if (add) add.onclick = function () { S.addToCart(p.id, qty); };
+    var add = $('#pd-add'); if (add) add.onclick = function () { S.addToCart(p.id, qty, selected === p.weight ? null : selected); };
     var wish = $('#pd-wish');
     if (wish) {
       var sync = function () { var on = S.inWish(p.id); wish.textContent = on ? '♥' : '♡'; wish.style.color = on ? '#c0392b' : '#1b1b16'; };
@@ -472,6 +506,77 @@
     });
   }
 
+  /* ===================== POLICIES ===================== */
+  var POLICIES = [
+    { key: 'privacy', title: 'Privacy Policy', updated: 'Last updated: June 2026 · Bijamrit Foods Retail Pvt. Ltd.', body: [
+      ['', 'At Bijamrit, your privacy matters. This policy explains what information we collect, how we use it, and the choices you have. We collect only what we need to process your orders and we never sell your data to third parties.'],
+      ['Information we collect', 'Contact information (name, email, phone), shipping and billing addresses, order history, and payment confirmation — payments are processed securely by our partners and we never store your card numbers. We also collect limited usage data (pages viewed, device type) to improve the store.'],
+      ['How we use your information', 'To fulfil and deliver orders, provide customer support, send order updates, prevent fraud, and — only if you opt in — share festive offers and new-flavour announcements. You can unsubscribe from marketing at any time.'],
+      ['Cookies', 'We use essential cookies to keep your cart and login working, and optional analytics cookies to understand how the store is used. You can control cookies through your browser settings.'],
+      ['Data sharing & security', 'We share data only with trusted partners who help us operate — payment gateways, logistics and delivery partners — under strict confidentiality. Your information is protected with industry-standard security measures.'],
+      ['Your rights', 'You may request access to, correction of, or deletion of your data at any time by writing to <strong>care@bijamrit.com</strong>. We will respond within a reasonable timeframe.'],
+      ['Contact', 'Bijamrit Foods Retail Pvt. Ltd., Shivajee Colony, Near Girls High School, Purnea, Bihar 854301, India · care@bijamrit.com · +91 98765 43210']
+    ]},
+    { key: 'terms', title: 'Terms & Conditions', updated: 'Last updated: June 2026 · Bijamrit Foods Retail Pvt. Ltd.', body: [
+      ['', 'Welcome to Bijamrit. By browsing our store and placing an order you agree to these terms. Please read them carefully — they set out how we work together.'],
+      ['Orders & acceptance', 'An order is confirmed only after you receive an order-confirmation email. We may decline or cancel an order in case of pricing errors, suspected fraud, or stock unavailability, and any amount charged will be refunded in full.'],
+      ['Pricing & payment', 'All prices are listed in Indian Rupees (₹) and are inclusive of applicable taxes unless stated otherwise. Payment is taken at checkout via UPI, cards or cash on delivery. Coupon codes (e.g. WELCOME10, SAVE150, FREESHIP) are subject to their stated minimum-order conditions and cannot be clubbed.'],
+      ['Product information', 'We make every effort to describe our makhana accurately, but flavour intensity, pack weights and images are indicative. Being a natural product, slight variation in size and colour is normal.'],
+      ['Acceptable use', 'You agree not to misuse the site, attempt unauthorised access, or resell our products without written permission. All content, logos and images remain the property of Bijamrit Foods Retail Pvt. Ltd.'],
+      ['Liability', 'Our liability for any order is limited to the value of that order. We are not responsible for delays caused by events beyond our control such as weather, strikes or courier disruptions.'],
+      ['Governing law', 'These terms are governed by the laws of India, and any disputes are subject to the jurisdiction of the courts of Purnea, Bihar.'],
+      ['Contact', 'Questions about these terms? Write to care@bijamrit.com or call +91 98765 43210.']
+    ]},
+    { key: 'refund', title: 'Refund Policy', updated: 'Last updated: June 2026 · Bijamrit Foods Retail Pvt. Ltd.', body: [
+      ['', 'Your satisfaction is important to us. Because makhana is a food product, our refund policy balances fairness with food-safety rules.'],
+      ['Eligibility', 'You may request a refund or replacement within <strong>7 days</strong> of delivery if your order arrives damaged, tampered, expired, or incorrect. Items must be unopened unless the issue is a quality defect.'],
+      ['How to request', 'Email care@bijamrit.com with your order number and a photo of the product and packaging. Our team will review and respond within 48 hours.'],
+      ['Refund method & timeline', 'Approved refunds are issued to your original payment method within <strong>5–7 business days</strong>. For cash-on-delivery orders, refunds are processed via UPI or bank transfer.'],
+      ['Non-refundable items', 'Opened or partially consumed packs (except quality defects), clearance/festive-sale items marked final sale, and shipping charges on non-defective returns are not refundable.'],
+      ['Cancellations', 'Orders can be cancelled free of charge any time before they are dispatched. Once shipped, an order follows the returns process above.'],
+      ['Contact', 'Need help with a refund? Write to care@bijamrit.com or call +91 98765 43210.']
+    ]},
+    { key: 'shipping', title: 'Shipping Policy', updated: 'Last updated: June 2026 · Bijamrit Foods Retail Pvt. Ltd.', body: [
+      ['', 'We deliver fresh, slow-roasted makhana across India. Here is everything you need to know about how your order reaches you.'],
+      ['Delivery time', 'Orders are dispatched within <strong>1–2 business days</strong> and typically arrive in <strong>3–7 business days</strong> depending on your location. Remote pin codes may take a little longer.'],
+      ['Shipping charges', 'Shipping is <strong>free on orders over ₹599</strong>. A flat fee of ₹49 applies to smaller orders. Use code <strong>FREESHIP</strong> for free delivery with no minimum during offer periods.'],
+      ['Coverage', 'We ship pan-India to all serviceable pin codes via trusted courier partners. We currently do not offer international shipping.'],
+      ['Order tracking', 'Once your order ships you will receive a tracking link by email and SMS so you can follow it to your doorstep.'],
+      ['Packaging', 'Every order is sealed in food-grade, nitrogen-flushed packaging to lock in the crunch and freshness during transit.'],
+      ['Delays', 'Festive rushes, weather and courier disruptions can occasionally cause delays. If your order is significantly late, reach out and we will chase it for you.'],
+      ['Contact', 'Shipping questions? Write to care@bijamrit.com or call +91 98765 43210.']
+    ]}
+  ];
+  function initPolicies() {
+    if (page !== 'Policies') return;
+    var nav = $('#pol-nav'), body = $('#pol-body'); if (!nav || !body) return;
+    function renderBody(p) {
+      body.innerHTML = '<h3 style="font-size:20px;font-weight:800;margin-bottom:6px">' + p.title + '</h3>'
+        + '<div style="font-size:12px;color:#8a8678;margin-bottom:16px">' + p.updated + '</div>'
+        + p.body.map(function (s) {
+            return (s[0] ? '<div style="font-size:15px;font-weight:800;margin:18px 0 8px">' + s[0] + '</div>' : '')
+              + '<p style="font-size:13px;color:#6b6b62;line-height:1.8;margin-bottom:16px">' + s[1] + '</p>';
+          }).join('');
+    }
+    function renderNav(activeKey) {
+      nav.innerHTML = POLICIES.map(function (p) {
+        var on = p.key === activeKey;
+        return '<span class="pol-tab bij-btn" data-key="' + p.key + '" style="cursor:pointer;font-size:13px;font-weight:' + (on ? '700' : '600')
+          + ';padding:12px 16px;border-radius:10px;' + (on ? 'background:#e6eff0;color:#355a6e' : 'color:#6b6b62') + '">' + p.title + '</span>';
+      }).join('');
+      nav.querySelectorAll('.pol-tab').forEach(function (tab) {
+        tab.onclick = function () { select(tab.dataset.key); };
+      });
+    }
+    function select(key) {
+      var p = POLICIES.filter(function (x) { return x.key === key; })[0] || POLICIES[0];
+      renderNav(p.key); renderBody(p);
+      body.classList.remove('bij-fade'); void body.offsetWidth; body.classList.add('bij-fade');
+    }
+    // honour ?p=terms etc.; default privacy
+    select(qs('p') || 'privacy');
+  }
+
   /* ===================== announcement marquee ===================== */
   function initMarquee() {
     document.querySelectorAll('div').forEach(function (el) {
@@ -490,7 +595,7 @@
 
   function run() {
     initShop(); initCart(); initCheckout(); initWishlist(); initSearch();
-    initProduct(); initHome(); initContact(); initOffers(); initMarquee();
+    initProduct(); initHome(); initContact(); initOffers(); initMarquee(); initPolicies();
     wireCopy();
     if (S) S.updateBadge();
   }

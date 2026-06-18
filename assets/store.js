@@ -41,6 +41,14 @@
 
   function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
 
+  // weight variants: price scales from the listed (100g) price; key = "id" or "id__250g"
+  var WEIGHTS = [{ label: '100g', mult: 1 }, { label: '250g', mult: 2.3 }, { label: '500g', mult: 4.2 }];
+  function weightMult(w) { for (var i = 0; i < WEIGHTS.length; i++) if (WEIGHTS[i].label === w) return WEIGHTS[i].mult; return 1; }
+  function splitKey(key) { var i = String(key).indexOf('__'); return i === -1 ? { id: key, weight: null } : { id: key.slice(0, i), weight: key.slice(i + 2) }; }
+  function lineKey(id, weight) { return weight ? id + '__' + weight : id; }
+  function priceOf(key) { var s = splitKey(key), p = byId[s.id]; if (!p) return 0; return s.weight ? Math.round(p.price * weightMult(s.weight) / weightMult(p.weight) / 5) * 5 : p.price; }
+  function weightOf(key) { var s = splitKey(key), p = byId[s.id]; return s.weight || (p ? p.weight : ''); }
+
   var Store = {
     PRODUCTS: PRODUCTS,
     PROMOS: PROMOS,
@@ -50,17 +58,24 @@
     promo: getPromo,
     fmt: fmt,
 
+    WEIGHTS: WEIGHTS,
+    key: lineKey,
+    lineId: function (key) { return splitKey(key).id; },
+    lineWeight: weightOf,
+    linePrice: priceOf,
+
     cartCount: function () {
       var c = getCart(), n = 0; for (var k in c) n += c[k]; return n;
     },
-    addToCart: function (id, qty) {
-      qty = qty || 1; var c = getCart(); c[id] = (c[id] || 0) + qty; write(CK, c);
-      this.updateBadge(); this.toast((byId[id] ? byId[id].name : 'Item') + ' added to cart');
+    addToCart: function (id, qty, weight) {
+      qty = qty || 1; var key = lineKey(id, weight); var c = getCart(); c[key] = (c[key] || 0) + qty; write(CK, c);
+      this.updateBadge();
+      this.toast((byId[id] ? byId[id].name : 'Item') + (weight ? ' (' + weight + ')' : '') + ' added to cart');
     },
-    setQty: function (id, qty) {
-      var c = getCart(); if (qty <= 0) delete c[id]; else c[id] = qty; write(CK, c); this.updateBadge();
+    setQty: function (key, qty) {
+      var c = getCart(); if (qty <= 0) delete c[key]; else c[key] = qty; write(CK, c); this.updateBadge();
     },
-    removeFromCart: function (id) { var c = getCart(); delete c[id]; write(CK, c); this.updateBadge(); },
+    removeFromCart: function (key) { var c = getCart(); delete c[key]; write(CK, c); this.updateBadge(); },
     clearCart: function () { write(CK, {}); this.updateBadge(); },
 
     inWish: function (id) { return getWish().indexOf(id) !== -1; },
@@ -82,7 +97,7 @@
     clearPromo: function () { localStorage.removeItem(PK); },
 
     subtotal: function () {
-      var c = getCart(), s = 0; for (var k in c) if (byId[k]) s += byId[k].price * c[k]; return s;
+      var c = getCart(), s = 0; for (var k in c) s += priceOf(k) * c[k]; return s;
     },
     totals: function () {
       var sub = this.subtotal();
@@ -147,7 +162,8 @@
     + '.bij-marquee{overflow:hidden;white-space:nowrap}'
     + '.bij-marquee-track{display:inline-block;white-space:nowrap;animation:bijMarquee 26s linear infinite;will-change:transform}'
     + '.bij-marquee:hover .bij-marquee-track{animation-play-state:paused}'
-    + '@keyframes bijMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}';
+    + '@keyframes bijMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}'
+    + '.bij-fade{animation:bijUp .35s ease both}';
   document.head.appendChild(css);
 
   window.Store = Store;
