@@ -1,8 +1,23 @@
 # Bijamrit — Makhana store (frontend)
 
-A pixel-faithful, fully navigable static rebuild of the **Bijamrit** design.
-Each screen from the design is its own real page, and every nav link, header
-icon, product card and CTA button navigates.
+**Live site:** https://soumyacode1-prog.github.io/bijamrit/
+
+A pixel-faithful, fully **interactive** rebuild of the **Bijamrit** design.
+Each screen is its own real page; every nav link, product card and CTA works,
+and the store has a working cart, wishlist, filters, promo codes, search,
+contact form + map, and playable videos.
+
+## Features
+
+- **Shop filters** — category, dual price slider, rating, and sort all filter the grid live.
+- **Cart** — add/remove, change quantity, totals update; persists across pages (localStorage).
+- **Promo codes** — `WELCOME10` (10% off), `SAVE150` (₹150 off over ₹999), `FREESHIP` (free shipping).
+- **Wishlist** — save items from any card; view/remove on the wishlist page.
+- **Checkout** — real form fields, order summary from your cart, "Pay" places the order.
+- **Search** — live filtering as you type, plus popular-term chips.
+- **Contact** — writable form with validation + a live Google Map of Shivajee Colony, Purnea, Bihar.
+- **Videos** — featured-video cards open a working video player.
+- **Animations** — page fade-in, card hover-lift, add-to-cart pop, toasts.
 
 ## Run locally
 
